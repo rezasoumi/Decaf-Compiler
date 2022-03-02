@@ -1,2 +1,2 @@
-# Scala-Compiler
-compiler for scala language written in python. 
+# Decaf-Compiler
+compiler for Decaf language written in python. 
