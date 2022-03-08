@@ -10,7 +10,7 @@ step = 0
 
 ######################################
 # by setting only_one_test to a value different from None it will test only that testcase
-only_one_test = None
+only_one_test = 3
 ######################################
 
 for f in listdir('tests/test/in-out'):
@@ -22,7 +22,9 @@ for f in listdir('tests/test/in-out'):
         input = join_path(f)
         output = join_path(f[:-3] + ".out")
         t = run(input)
-        print("#" * 50, "test = ", step, "#" * 50)
+        print("#" * 50, "input test = ", step, "#" * 50)
         print(open(input).read())
-        print("<" * 10 + "=" * 40, "test = ", step, "=" * 40 + ">" * 10)
+        print("<" * 10 + "=" * 40, "our output test = ", step, "=" * 40 + ">" * 10)
         print(t)
+        print("$" * 50, "answer test = ", step, "$" * 50)
+        print(open(output).read())
