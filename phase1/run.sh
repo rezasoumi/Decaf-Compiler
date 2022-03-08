@@ -59,3 +59,5 @@ cd ../
 #echo "-> cleaning up."
 #clean
 echo "-> Done"
+
+sleep 500
