@@ -74,6 +74,7 @@ class T(Transformer):
         return super().__default_token__(token)
 
 def new_lexer(string):
+    string = replace_defines(string)
     all_tokens.clear()
     parser = Lark(rules, parser='lalr', transformer=T())
     parser.parse(string)
