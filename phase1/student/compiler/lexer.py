@@ -30,23 +30,25 @@ def replace_defines(input):
 
 
 rules = """
-    start : (ID | OPERATOR_PUNC | KEYWORDS | BOOLEAN_LIT | INT_LIT | DOUBLE_LIT)*
-    ID: /[a-zA-Z][a-zA-Z0-9_]*/
-    OPERATOR_PUNC: "+" | "-" | "*" | "/" | "%" | "<" | "<=" | ">" | ">=" | "=" 
-                    | "+=" | "-+" | "*=" | "/=" | "==" | "!=" | "&&" |  "||" 
-                    | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  
-    
-    KEYWORDS: "__func__" | "__line__" | "bool" | "break" | "btoi" | "class" | "continue" 
+    start : (ID | OPERATOR_PUNC | KEYWORDS | BOOLEAN_LIT | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
+    KEYWORDS.1: "__func__" | "__line__" | "bool" | "break" | "btoi" | "class" | "continue" 
                 | "double" | "dtoi" | "else" | "for" | "if" | "import" | "int" | "itob" 
                 | "itod" | "new" | "NewArray" | "null" | "Print" | "private" | "public" 
                 | "ReadInteger" | "ReadLine" | "return" | "string" | "this" | "void" | "while"
     
-    BOOLEAN_LIT: "true" | "false" 
+    ID: /[a-zA-Z][a-zA-Z0-9_]*/
+    OPERATOR_PUNC: "+" | "-" | "*" | "/" | "%" | "<" | "<=" | ">" | ">=" | "=" 
+                    | "+=" | "-+" | "*=" | "/=" | "==" | "!=" | "&&" |  "||" 
+                    | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  
+    MIDDLE_STRING_CHAR : /[^"]/
+    STRING_LIT : "\\""/[^"]*/"\\""
+    BOOLEAN_LIT.1: "true" | "false" 
     INT_LIT : /0[Xx][0-9a-fA-F]+/ | /[0-9]+/
     DOUBLE_LIT : /[0-9]+\\.[0-9]*/ | /[0-9]+\\.[0-9]*[Ee][+-]?[0-9]+/
-    
+    COMMENT.1 : "//"/[^\\n]*/"\\n" | "/*" /.*/ "*/" | "/*" /.*/ "\\n"
     %import common.WS -> WS
     %ignore WS
+    %ignore COMMENT
 """
 all_tokens = []
 
@@ -63,6 +65,9 @@ class T(Transformer):
     def DOUBLE_LIT(self , token):
         all_tokens.append(("T_DOUBLELITERAL " + token))
         return "T_DOUBLELITERAL " + token
+    def STRING_LIT(self , token):
+        all_tokens.append(("T_STRINGLITERAL " + token))
+        return "T_STRINGLITERAL " + token
     def OPERATOR_PUNC(self , token):
         all_tokens.append( token)
         return token
