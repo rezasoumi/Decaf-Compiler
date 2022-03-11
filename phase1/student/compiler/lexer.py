@@ -30,20 +30,8 @@ def replace_defines(input):
     return answer
 
 
-all_keywords = ["__func__"  "__line__"
-                "bool", "break", "btoi ", "class ", "continue",
-                "double", "dtoi", "else", "for",
-                "if", "import", "int", "itob",
-                "itod", "new", "NewArray", "null", "Print", "private", "public",
-                "ReadInteger", "ReadLine", "return", "string", "this", "void  ", "while",
-                ]
 rules = """
-    start : (ID | OPERATOR_PUNC | KEYWORDS | BOOLEAN_LIT | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
-    KEYWORDS.1: "__func__" | "__line__" 
-                | /bool[\\s]/ | /break[\\s]/ | /btoi[\\s]/ | /class[\\s]/ | /continue[\\s]/ 
-                | /double[\\s]/|  /dtoi[\\s]/|  /else[\\s]/|  /for[\\s]/|  /if[\\s]/ |  /import[\\s]/|  /int[\\s]/|  /itob[\\s]/ 
-                | /itod[\\s]/ | /new[\\s]/|  /NewArray[\\s]/|  /null[\\s]/|  /Print[\\s]/|  /private[\\s]/|  /public[\\s]/ 
-                | /ReadInteger[\\s]/|  /ReadLine[\\s]/|  /return[\\s]/|  /string[\\s]/|  /this[\\s\\S]/ |  /void[\\s]/ |  /while[\\s]/
+    start : (ID | OPERATOR_PUNC | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
                 
     ID: /[a-zA-Z][a-zA-Z0-9_]*/
     OPERATOR_PUNC: "+" | "-" | "*" | "/" | "%" | "<" | "<=" | ">" | ">=" | "=" 
@@ -51,7 +39,6 @@ rules = """
                     | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  
     MIDDLE_STRING_CHAR : /[^"]/
     STRING_LIT : "\\""/[^"]*/"\\""
-    BOOLEAN_LIT.1: "true" | "false" 
     INT_LIT : /0[Xx][0-9a-fA-F]+/ | /[0-9]+/
     DOUBLE_LIT : /[0-9]+\\.[0-9]*/ | /[0-9]+\\.[0-9]*[Ee][+-]?[0-9]+/
     COMMENT.1 : "//"/[^\\n]*/"\\n" | "/*" /.*/ "*/" | "/*" /.*/ "\\n"
@@ -61,19 +48,25 @@ rules = """
 """
 all_tokens = []
 
+keywords = ["__func__","__line__","bool","break","btoi" , 
+            "class","continue","double","dtoi","else","for","if",
+            "import","int","itob","itod","new","NewArray","null",
+            "Print","private","public","ReadInteger","ReadLine",
+            "return","string","this","void","while"]
+
+bools = ["true" , "false"]
 
 class T(Transformer):
     def ID(self, token):
-        if token in all_keywords:
-            token = token.rstrip()
+        if token in keywords:
             all_tokens.append(token)
             return token
-        all_tokens.append(("T_ID " + token))
-        return "T_ID " + token
-
-    def BOOLEAN_LIT(self, token):
-        all_tokens.append(("T_BOOLEANLITERAL " + token))
-        return "T_BOOLEANLITERAL " + token
+        elif token in bools:
+            all_tokens.append(("T_BOOLEANLITERAL " + token))
+            return "T_BOOLEANLITERAL " + token
+        else:
+            all_tokens.append(("T_ID " + token))
+            return "T_ID " + token
 
     def INT_LIT(self, token):
         all_tokens.append(("T_INTLITERAL " + token))
@@ -91,19 +84,14 @@ class T(Transformer):
         all_tokens.append(token)
         return token
 
-    def KEYWORDS(self, token):
-        token = token.rstrip()
-        all_tokens.append(token)
-        return token
-
     def __default_token__(self, token):
         all_tokens.append(token)
         return super().__default_token__(token)
 
 
 def new_lexer(string):
-    string = replace_defines(string + ' ')
+    string = replace_defines(string+' ')
     all_tokens.clear()
     parser = Lark(rules, parser='lalr', transformer=T())
-    parser.parse(string + ' ')
+    parser.parse(string+' ')
     return '\n'.join(all_tokens) + "\n"

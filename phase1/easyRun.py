@@ -1,4 +1,4 @@
-from phase1.student.compiler.main import run
+from student.compiler.main import run
 from os import listdir
 
 
