@@ -10,9 +10,10 @@ step = 0
 
 ######################################
 # by setting only_one_test to a value different from None it will test only that testcase
-tests = None #[8,10]
+tests = None
 ######################################
 
+acc = 0
 for f in listdir('tests/test/in-out'):
     if f[-3:] == ".in":
         step += 1
@@ -24,7 +25,14 @@ for f in listdir('tests/test/in-out'):
         t = run(input).rstrip()
         answer = open(output).read().rstrip()
 
-        if answer != t:
+        good = True
+        outputList = answer.rstrip().lstrip().split('\n')
+        tList = t.rstrip().lstrip().split('\n')
+        for i in range(len(outputList)):
+            if len(tList) > i and outputList[i].rstrip().lstrip() != tList[i].rstrip().lstrip():
+                good = False
+
+        if not good:
             print("#" * 50, "input test = ", step, "#" * 50)
             print(open(input).read())
             print("<" * 10 + "=" * 40, "our output test = ", step, "=" * 40 + ">" * 10)
@@ -32,12 +40,13 @@ for f in listdir('tests/test/in-out'):
             print("$" * 50, "answer test = ", step, "$" * 50)
             print(answer)
             print("@" * 50, "diff test = ", step, "@" * 50)
-            outputList = answer.split('\n')
-            tList = t.split('\n')
             for i in range(len(outputList)):
-                if len(tList) > i and outputList[i] != tList[i]:
+                if len(tList) > i and outputList[i].rstrip().lstrip() != tList[i].rstrip().lstrip():
                     print(i, "\t", tList[i], "   ==>  ", outputList[i])
                 if len(tList) <= i:
                     print(i, "\t", "nothing", "   ==>  ", outputList[i])
         else:
+            acc += 1
             print("pass test", step)
+
+print("accept", acc, "tests")
