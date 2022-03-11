@@ -84,5 +84,5 @@ def new_lexer(string):
     all_tokens.clear()
     parser = Lark(rules, parser='lalr', transformer=T())
     parser.parse(string)
-    return '\n'.join(all_tokens)
+    return '\n'.join(all_tokens)+"\n"
 
