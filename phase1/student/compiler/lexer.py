@@ -22,10 +22,11 @@ def replace_defines(input):
     answer = ""
     for line in input_array:
         line = replace_line(define_map, line)
-        answer += line + "\n"
         split_form = line.split()
-        if len(split_form) == 3 and split_form[0] == 'define':
-            define_map[split_form[1]] = split_form[2]
+        if len(split_form) >= 3 and split_form[0] == 'define':
+            define_map[split_form[1]] = " ".join(split_form[2:])
+        else:
+            answer += line + "\n"
     return answer
 
 
