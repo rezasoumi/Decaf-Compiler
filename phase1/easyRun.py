@@ -28,3 +28,11 @@ for f in listdir('tests/test/in-out'):
         print(t)
         print("$" * 50, "answer test = ", step, "$" * 50)
         print(open(output).read())
+        print("@" * 50, "diff test = ", step, "@" * 50)
+        outputList = open(output).read().split('\n')
+        tList = t.split('\n')
+        for i in range(len(outputList)):
+            if len(tList) > i and outputList[i] != tList[i]:
+                print(i, "\t", tList[i], "   ==>  ", outputList[i])
+            if len(tList) <= i:
+                print(i, "\t", "nothing", "   ==>  ", outputList[i])
