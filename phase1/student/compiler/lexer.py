@@ -31,9 +31,10 @@ def replace_defines(input):
 
 
 rules = """
-    start : (ID | OPERATOR_PUNC | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
+    start : (ID | KEYWORD | OPERATOR_PUNC | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
                 
     ID: /[a-zA-Z][a-zA-Z0-9_]*/
+    KEYWORD: /__func__[\\s]/ | /__line__[\\s]/
     OPERATOR_PUNC: "+" | "-" | "*" | "/" | "%" | "<" | "<=" | ">" | ">=" | "=" 
                     | "+=" | "-=" | "-+" | "*=" | "/=" | "==" | "!=" | "&&" |  "||" 
                     | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  
@@ -48,15 +49,21 @@ rules = """
 """
 all_tokens = []
 
-keywords = ["__func__","__line__","bool","break","btoi" , 
-            "class","continue","double","dtoi","else","for","if",
-            "import","int","itob","itod","new","NewArray","null",
-            "Print","private","public","ReadInteger","ReadLine",
-            "return","string","this","void","while"]
+keywords = ["__func__", "__line__", "bool", "break", "btoi",
+            "class", "continue", "double", "dtoi", "else", "for", "if",
+            "import", "int", "itob", "itod", "new", "NewArray", "null",
+            "Print", "private", "public", "ReadInteger", "ReadLine",
+            "return", "string", "this", "void", "while"]
 
-bools = ["true" , "false"]
+bools = ["true", "false"]
+
 
 class T(Transformer):
+    def KEYWORD(self, token):
+        token=token.rstrip()
+        all_tokens.append(token)
+        return token
+
     def ID(self, token):
         if token in keywords:
             all_tokens.append(token)
@@ -90,8 +97,8 @@ class T(Transformer):
 
 
 def new_lexer(string):
-    string = replace_defines(string+' ')
+    string = replace_defines(string + ' ')
     all_tokens.clear()
     parser = Lark(rules, parser='lalr', transformer=T())
-    parser.parse(string+' ')
+    parser.parse(string + ' ')
     return '\n'.join(all_tokens) + "\n"
