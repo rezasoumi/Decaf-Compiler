@@ -32,10 +32,14 @@ def replace_defines(input):
 
 rules = """
     start : (ID | OPERATOR_PUNC | KEYWORDS | BOOLEAN_LIT | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
-    KEYWORDS.1: "__func__" | "__line__" | "bool" | "break" | "btoi" | "class" | "continue" 
-                | "double" | "dtoi" | "else" | "for" | "if" | "import" | "int" | "itob" 
-                | "itod" | "new" | "NewArray" | "null" | "Print" | "private" | "public" 
-                | "ReadInteger" | "ReadLine" | "return" | "string" | "this" | "void" | "while"
+    KEYWORDS.1: "__func__" | "__line__" | "bool " | "break " | "btoi " | "class " | "continue " 
+                | "double " | "dtoi " | "else " | "for " | "if " | "import " | "int " | "itob " 
+                | "itod " | "new " | "NewArray " | "null " | "Print " | "private " | "public " 
+                | "ReadInteger " | "ReadLine " | "return " | "string " | "this " | "void " | "while "
+                | "bool\\n" | "break\\n" | "btoi\\n" | "class\\n" | "continue\\n" 
+                | "double\\n"|  "dtoi\\n"|  "else\\n"|  "for\\n"|  "if\\n"|  "import\\n"|  "int\\n"|  "itob\\n" 
+                | "itod\\n" | "new\\n"|  "NewArray\\n"|  "null\\n"|  "Print\\n"|  "private\\n"|  "public\\n" 
+                | "ReadInteger\\n"|  "ReadLine\\n"|  "return\\n"|  "string\\n"|  "this\\n"|  "void\\n"|  "while\\n"
     
     ID: /[a-zA-Z][a-zA-Z0-9_]*/
     OPERATOR_PUNC: "+" | "-" | "*" | "/" | "%" | "<" | "<=" | ">" | ">=" | "=" 
@@ -53,36 +57,47 @@ rules = """
 """
 all_tokens = []
 
+
 class T(Transformer):
     def ID(self, token):
         all_tokens.append(("T_ID " + token))
         return "T_ID " + token
+
     def BOOLEAN_LIT(self, token):
         all_tokens.append(("T_BOOLEANLITERAL " + token))
         return "T_BOOLEANLITERAL " + token
-    def INT_LIT(self , token):
+
+    def INT_LIT(self, token):
         all_tokens.append(("T_INTLITERAL " + token))
         return "T_INTLITERAL " + token
-    def DOUBLE_LIT(self , token):
+
+    def DOUBLE_LIT(self, token):
         all_tokens.append(("T_DOUBLELITERAL " + token))
         return "T_DOUBLELITERAL " + token
-    def STRING_LIT(self , token):
+
+    def STRING_LIT(self, token):
         all_tokens.append(("T_STRINGLITERAL " + token))
         return "T_STRINGLITERAL " + token
-    def OPERATOR_PUNC(self , token):
-        all_tokens.append( token)
-        return token
-    def KEYWORDS(self , token):
+
+    def OPERATOR_PUNC(self, token):
         all_tokens.append(token)
         return token
+
+    def KEYWORDS(self, token):
+        if token.endswith("\n") or token.endswith(" "):
+            token = token[:-1]
+
+        all_tokens.append(token)
+        return token
+
     def __default_token__(self, token):
         all_tokens.append(token)
         return super().__default_token__(token)
+
 
 def new_lexer(string):
     string = replace_defines(string)
     all_tokens.clear()
     parser = Lark(rules, parser='lalr', transformer=T())
     parser.parse(string)
-    return '\n'.join(all_tokens)+"\n"
-
+    return '\n'.join(all_tokens) + "\n"
