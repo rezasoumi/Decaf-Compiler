@@ -31,15 +31,14 @@ def replace_defines(input):
 
 
 rules = """
-    start : (ID | KEYWORD | OPERATOR_PUNC | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
+    start : (ID | OPERATOR_PUNC | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
                 
-    ID: /[a-zA-Z][a-zA-Z0-9_]*/
-    KEYWORD: /__func__[\\s]/ | /__line__[\\s]/
+    ID: /[a-zA-Z][a-zA-Z0-9_]*/ | /__func__[a-zA-Z0-9_]*/ | /__line__[a-zA-Z0-9_]*/ 
     OPERATOR_PUNC: "+" | "-" | "*" | "/" | "%" | "<" | "<=" | ">" | ">=" | "=" 
                     | "+=" | "-=" | "-+" | "*=" | "/=" | "==" | "!=" | "&&" |  "||" 
                     | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  
     MIDDLE_STRING_CHAR : /[^"]/
-    STRING_LIT : "\\""/[^"]*/"\\""
+    STRING_LIT : "\\""/[^"|\\\\"]*/"\\""
     INT_LIT : /0[Xx][0-9a-fA-F]+/ | /[0-9]+/
     DOUBLE_LIT : /[0-9]+\\.[0-9]*/ | /[0-9]+\\.[0-9]*[Ee][+-]?[0-9]+/
     COMMENT.1 : "//"/[^\\n]*/"\\n" | "/*" /.*/ "*/" | "/*" /.*/ "\\n"
@@ -59,11 +58,6 @@ bools = ["true", "false"]
 
 
 class T(Transformer):
-    def KEYWORD(self, token):
-        token=token.rstrip()
-        all_tokens.append(token)
-        return token
-
     def ID(self, token):
         if token in keywords:
             all_tokens.append(token)
