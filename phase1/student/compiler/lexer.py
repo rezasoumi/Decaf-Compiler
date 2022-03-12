@@ -36,12 +36,12 @@ rules = """
     ID: /[a-zA-Z][a-zA-Z0-9_]*/ | /__func__[a-zA-Z0-9_]*/ | /__line__[a-zA-Z0-9_]*/ 
     OPERATOR_PUNC: "+" | "-" | "*" | "/" | "%" | "<" | "<=" | ">" | ">=" | "=" 
                     | "+=" | "-=" | "-+" | "*=" | "/=" | "==" | "!=" | "&&" |  "||" 
-                    | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  
+                    | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  | "$"
     MIDDLE_STRING_CHAR : /[^"]/
     STRING_LIT : /\\"[^"]*\\"/ 
     INT_LIT : /0[Xx][0-9a-fA-F]+/ | /[0-9]+/
     DOUBLE_LIT : /[0-9]+\\.[0-9]*/ | /[0-9]+\\.[0-9]*[Ee][+-]?[0-9]+/
-    COMMENT.1 : "//"/[^\\n]*/"\\n" | "/*" /.*/ "*/" | "/*" /.*/ "\\n" | /\\/\\*[(\\s\\S)^(\\/)]*\\*\\//
+    COMMENT.1 : "//"/[^\\n]*/"\\n" | "/*" /[^$]*/ "$" 
     %import common.WS -> WS
     %ignore WS
     %ignore COMMENT
@@ -81,6 +81,7 @@ class T(Transformer):
         return "T_DOUBLELITERAL " + token
 
     def STRING_LIT(self, token):
+        token = token.replace("$", "*/")
         append_to_prev = False
         if len(token) >= 2 and token[len(token) - 2] == '\\':
             token = token[:-1]
@@ -96,6 +97,10 @@ class T(Transformer):
         return "T_STRINGLITERAL " + token
 
     def OPERATOR_PUNC(self, token):
+        if token == "$":
+            all_tokens.append("*")
+            all_tokens.append("/")
+            return "/"
         all_tokens.append(token)
         return token
 
@@ -108,6 +113,7 @@ def new_lexer(string):
     string = replace_defines(string + ' ')
     all_tokens.clear()
     string = string.replace('\\"', '\\""')
+    string = string.replace('*/', '$')
     parser = Lark(rules, parser='lalr', transformer=T())
     parser.parse(string + ' ')
     return '\n'.join(all_tokens) + "\n"
