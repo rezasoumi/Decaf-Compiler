@@ -13,7 +13,7 @@ def replace_line(define_map, line):
         answer += i
     return answer
 
-def replace_defines(input_lines):
+def replace_defines(input):
     """replace lines with defined map with iteration"""
     input_lines = input.split("\n")
     define_map = {} 
