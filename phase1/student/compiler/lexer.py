@@ -38,10 +38,10 @@ rules = """
                     | "+=" | "-=" | "-+" | "*=" | "/=" | "==" | "!=" | "&&" |  "||" 
                     | "!" | ";" | "," | "." | "[" | "]" | "(" | ")" | "{" | "}"  
     MIDDLE_STRING_CHAR : /[^"]/
-    STRING_LIT : "\\""/[^"|\\\\"]*/"\\""
+    STRING_LIT : /\\"[^"]*\\"/ 
     INT_LIT : /0[Xx][0-9a-fA-F]+/ | /[0-9]+/
     DOUBLE_LIT : /[0-9]+\\.[0-9]*/ | /[0-9]+\\.[0-9]*[Ee][+-]?[0-9]+/
-    COMMENT.1 : "//"/[^\\n]*/"\\n" | "/*" /.*/ "*/" | "/*" /.*/ "\\n"
+    COMMENT.1 : "//"/[^\\n]*/"\\n" | "/*" /.*/ "*/" | "/*" /.*/ "\\n" | /\\/\\*[(\\s\\S)^(\\/)]*\\*\\//
     %import common.WS -> WS
     %ignore WS
     %ignore COMMENT
@@ -66,6 +66,9 @@ class T(Transformer):
             all_tokens.append(("T_BOOLEANLITERAL " + token))
             return "T_BOOLEANLITERAL " + token
         else:
+            if token[0] == '_':
+                # all_tokens.append(("T_ID " + token))
+                raise NotImplemented
             all_tokens.append(("T_ID " + token))
             return "T_ID " + token
 
@@ -78,7 +81,18 @@ class T(Transformer):
         return "T_DOUBLELITERAL " + token
 
     def STRING_LIT(self, token):
-        all_tokens.append(("T_STRINGLITERAL " + token))
+        append_to_prev = False
+        if len(token) >= 2 and token[len(token) - 2] == '\\':
+            token = token[:-1]
+            append_to_prev = True
+
+        if hasattr(self, "append_to_prev") and self.append_to_prev:
+            all_tokens[len(all_tokens) - 1] += token
+        else:
+            all_tokens.append(("T_STRINGLITERAL " + token))
+
+        self.append_to_prev = append_to_prev
+
         return "T_STRINGLITERAL " + token
 
     def OPERATOR_PUNC(self, token):
@@ -93,6 +107,7 @@ class T(Transformer):
 def new_lexer(string):
     string = replace_defines(string + ' ')
     all_tokens.clear()
+    string = string.replace('\\"', '\\""')
     parser = Lark(rules, parser='lalr', transformer=T())
     parser.parse(string + ' ')
     return '\n'.join(all_tokens) + "\n"
