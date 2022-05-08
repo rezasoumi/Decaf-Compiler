@@ -1,4 +1,4 @@
-from .lexer import new_lexer
+from lexer import new_lexer
 
 
 def run(input_file_address: str) -> str:
@@ -16,3 +16,5 @@ def run(input_file_address: str) -> str:
     #     result += token
     #     result += "\n"
     # return result
+
+print(run("../../../phase2/tests/in-out/t002-class4.in"))

@@ -44,6 +44,6 @@ json_parser = Lark(r"""
 """, start='program', parser='lalr')
 
 def parser(string):
-    print(json_parser.parse(string))
+    return json_parser.parse(string)
 
-parser("int x;")
+# parser("int x;")
