@@ -14,7 +14,8 @@ json_parser = Lark(r"""
     access_mode: "private" | "public" | "protected" | null
     interface_decl: "interface" ident "{" prototype* "}"
     prototype: type ident "(" formals ");" | "void" ident "(" formals ");" 
-    stmtblock: "{" variable_decl* stmt* "}"
+    stmtblock: "{" linestmtblock* "}"
+    linestmtblock: variable_decl | stmt
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
     ifstmt: "if(" expr ")" stmt ("else" stmt)?
     whilestmt: "while(" expr ")" stmt
