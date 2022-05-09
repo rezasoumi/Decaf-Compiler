@@ -91,7 +91,7 @@ def parser(string):
     string = string.replace(");", ") ;")
     string = replace_ident(string)
     string = re.sub("\[[ ]+\]",'[]',string)
-    print(string)
+    # print(string)
     return json_parser.parse(string)
 
 
