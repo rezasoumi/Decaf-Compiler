@@ -2,6 +2,8 @@ import re
 
 from lark import Lark
 
+from phase1.student.compiler.lexer import replace_defines
+
 json_parser = Lark(r"""
     program: macro* decl+
     macro: "import" ESCAPED_STRING
@@ -26,7 +28,7 @@ json_parser = Lark(r"""
     breakstmt: "break" ";"
     continuestmt: "continue" ";"
     printstmt: "Print" "(" expr ("," expr)* ")" ";"
-    expr: lvalue "=" expr | lvalue "+=" expr | lvalue "-=" expr | constant | lvalue | "this" | call | "(" expr ")" | expr "-" expr | expr "+" expr
+    expr: lvalue "=" expr | lvalue "+=" expr | lvalue "*=" expr | lvalue "/=" expr | lvalue "-=" expr | constant | lvalue | "this" | call | "(" expr ")" | expr "-" expr | expr "+" expr
         | expr "*" expr | expr "/" expr | expr "%" expr | "-" expr | expr "<" expr | expr "<=" expr
         | expr ">" expr | expr ">=" expr | expr "==" expr | expr "!=" expr | expr "&&" expr | expr "||" expr
         | "!" expr | "ReadInteger()" | "ReadLine()" | "new" ident | "NewArray" "(" expr "," type ")" | "itod(" expr ")"
@@ -84,11 +86,12 @@ def replace_ident(string):
 
 
 def parser(string):
+    # string = replace_defines(string + ' ')
     string = remove_comment(string)
     string = string.replace(");", ") ;")
     string = replace_ident(string)
     string = re.sub("\[[ ]+\]",'[]',string)
-    # print(string)
+    print(string)
     return json_parser.parse(string)
 
 
