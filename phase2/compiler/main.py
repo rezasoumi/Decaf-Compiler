@@ -19,7 +19,7 @@ for f in listdir('../tests/in-out'):
 correct = 0
 error = 0
 total = 0
-
+wrongs = []
 for step, name in enumerate(all_tests.keys()):
     total += 1
     try:
@@ -32,14 +32,14 @@ for step, name in enumerate(all_tests.keys()):
             # print("OK", step)
             correct += 1
         else:
+            wrongs.append(step)
             print("WRONG ", step)
     except:
         error += 1
         print("ERROR on", name)
 
-print("total=", total, "Correct=", correct, "Wrong=", total-error-correct,"Error=", error)
-
-
+print("total=", total, "Correct=", correct, "Wrong=", total - error - correct, "Error=", error)
+print(wrongs)
 step = int(input("which test to investigate?"))
 name = list(all_tests.keys())[step]
 answer = open(f"../tests/in-out/{name}.out").read()
