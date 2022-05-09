@@ -1,6 +1,6 @@
 from os import listdir
 
-from .parserC import parser
+from parserC import parser
 
 
 def run(input_file_address: str) -> bool:
@@ -11,7 +11,7 @@ def run(input_file_address: str) -> bool:
         return True
     except:
         return False
-
+#
 #
 # all_tests = {}
 # for f in listdir('../tests/in-out'):

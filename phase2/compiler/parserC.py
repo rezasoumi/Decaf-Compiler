@@ -2,8 +2,6 @@ import re
 
 from lark import Lark
 
-from .lexer import replace_defines
-
 json_parser = Lark(r"""
     program: macro* decl+
     macro: "import" ESCAPED_STRING
@@ -70,7 +68,7 @@ def reprep(string):
 
 
 def replace_ident(string):
-    stopWords=['.',' ','\n',']','[','(',')',';','!','-','\t']
+    stopWords=['.',' ','\n',']','[','(',')',';','!','-','\t','*','+','=']
     ans = ""
     current = ""
     for i in range(len(string)):
@@ -93,6 +91,40 @@ def parser(string):
     string = re.sub("\[[ ]+\]",'[]',string)
     # print(string)
     return json_parser.parse(string)
+
+
+
+
+def replace_line(define_map, line):
+    """replace line with defined map of previous line"""
+    line = re.split('( |"|\[|]|\(|\)|;|\n|\t)', line)
+    for i in range(len(line)):
+        if line[i] in define_map:
+            line[i] = define_map[line[i]]
+    answer = ""
+    for i in line:
+        answer += i
+    return answer
+
+
+def replace_defines(input):
+    """replace lines with defined map with iteration"""
+    input_lines = input.split("\n")
+    define_map = {}
+    answer = ""
+    pref = True
+    for line in input_lines:
+        line = replace_line(define_map, line)
+        split_form = line.split()
+        if len(split_form) >= 1 and split_form[0] != "define" and split_form[0] != "import":
+            pref = False
+        if len(split_form) >= 3 and split_form[0] == 'define' and pref:
+            # add key value of define to map
+            define_map[split_form[1]] = " ".join(split_form[2:])
+        else:
+            answer += line + "\n"
+
+    return answer
 
 
 # print(parser(open(f"../tests/in-out/t205-define.in").read()).pretty())
