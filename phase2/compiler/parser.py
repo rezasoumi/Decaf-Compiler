@@ -9,12 +9,12 @@ json_parser = Lark(r"""
     type: "int" | "double" | "bool" | "string" | ident | type "[]" 
     function_decl: type ident "(" formals ")" stmtblock | "void" ident "(" formals ")" stmtblock
     formals: variable ("," variable)+ |  variable | null
-    class_decl: "class" ident ("extends" ident)? ("implements" ("," ident)+)? "{" field* "}"
+    class_decl: "class" ident ("extends" ident)? ("implements" ident ("," ident)*)? "{" field* "}"
     field: access_mode variable_decl | access_mode function_decl
     access_mode: "private" | "public" | "protected" | null
     interface_decl: "interface" ident "{" prototype* "}"
     prototype: type ident "(" formals ");" | "void" ident "(" formals ");" 
-    stmtblock: "{" linestmtblock* "}"
+    stmtblock: "{" variable_decl* stmt* "}"
     linestmtblock: variable_decl | stmt | comment
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
     ifstmt: "if""(" expr ")" stmt ("else" stmt)?
@@ -23,15 +23,15 @@ json_parser = Lark(r"""
     returnstmt: "return" expr? ";"
     breakstmt: "break;"
     continuestmt: "continue;"
-    printstmt: "Print" "(" actuals ");"
+    printstmt: "Print" "(" expr ("," expr)* ");"
     expr: lvalue "=" expr | lvalue "+=" expr | lvalue "-=" expr | constant | lvalue | "this" | call | "(" expr ")" | expr "-" expr | expr "+" expr
         | expr "*" expr | expr "/" expr | expr "%" expr | "-" expr | expr "<" expr | expr "<=" expr
         | expr ">" expr | expr ">=" expr | expr "==" expr | expr "!=" expr | expr "&&" expr | expr "||" expr
         | "!" expr | "ReadInteger()" | "readLine()" | "new" ident | "NewArray(" expr "," type ")" | "itod(" expr ")"
         | "dtoi(" expr ")" | "itob(" expr ")" | "btoi(" expr ")"  
-    lvalue: ident | expr "." ident | "expr[" expr "]" 
+    lvalue: ident | expr "." ident | expr "[" expr "]" 
     call: ident "(" actuals ")" | expr "." ident "(" actuals ")" 
-    actuals: ("," expr)+  | null
+    actuals: expr ("," expr)*  | null
     constant: doubleconstant | INT | boolconstant | ESCAPED_STRING | base16 | "null"
     comment: "//"/[^\n]+/ | "/*"/[^\*]+/"*/"
     null:
