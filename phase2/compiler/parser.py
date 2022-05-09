@@ -1,9 +1,11 @@
+import re
+
 from lark import Lark
 
 json_parser = Lark(r"""
     program: macro* decl+
     macro: "import" ESCAPED_STRING
-    decl: variable_decl | function_decl | class_decl | interface_decl | comment
+    decl: variable_decl | function_decl | class_decl | interface_decl
     variable_decl: variable ";"
     variable: type ident
     type: "int" | "double" | "bool" | "string" | ident | type "[]" 
@@ -15,7 +17,7 @@ json_parser = Lark(r"""
     interface_decl: "interface" ident "{" prototype* "}"
     prototype: type ident "(" formals ");" | "void" ident "(" formals ");" 
     stmtblock: "{" variable_decl* stmt* "}"
-    linestmtblock: variable_decl | stmt | comment
+    linestmtblock: variable_decl | stmt 
     stmt: expr? ";" | ifstmt | whilestmt | whilestmt | forstmt | breakstmt | continuestmt | returnstmt | printstmt | stmtblock     
     ifstmt: "if""(" expr ")" stmt ("else" stmt)?
     whilestmt: "while""(" expr ")" stmt
@@ -33,7 +35,6 @@ json_parser = Lark(r"""
     call: ident "(" actuals ")" | expr "." ident "(" actuals ")" 
     actuals: expr ("," expr)*  | null
     constant: doubleconstant | INT | boolconstant | ESCAPED_STRING | base16 | "null"
-    comment: "//"/[^\n]+/ | "/*"/[^\*]+/"*/"
     null:
     ident: /[a-zA-Z][a-zA-Z0-9_]*/ | /__func__[a-zA-Z0-9_]*/ | /__line__[a-zA-Z0-9_]*/ 
     doubleconstant: /[0-9]+/"."/[0-9]+/ | /[0-9]+/"." | /[0-9]+/"."/[0-9]*[Ee][+-]?[0-9]+/
@@ -46,7 +47,16 @@ json_parser = Lark(r"""
     %ignore WS
 """, start='program', parser='lalr')
 
-def parser(string):
-    return json_parser.parse(string)
+def remove_comment(s):
+    s=s.replace("//","@")
+    s=re.sub("@[^\n]*","",s)
+    s=s.replace("/*","#")
+    s=s.replace("*/","@")
+    s=re.sub("#[^#@]*@","",s)
+    return s
 
-print(parser(open(f"../tests/in-out/myfile.in").read()).pretty())
+def parser(string):
+    string=remove_comment(string)
+    return json_parser.parse(string)
+print(parser(open(f"../tests/in-out/t006-function1.in").read()).pretty())
+

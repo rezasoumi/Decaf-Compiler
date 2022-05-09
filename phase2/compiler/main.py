@@ -1,6 +1,5 @@
 from os import listdir
 
-from phase1.student.compiler.lexer import new_lexer
 from phase2.compiler.parser import parser
 
 
