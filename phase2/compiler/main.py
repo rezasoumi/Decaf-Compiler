@@ -1,6 +1,6 @@
 from os import listdir
 
-from phase2.compiler.parser import parser
+from .parserC import parser
 
 
 def run(input_file_address: str) -> bool:

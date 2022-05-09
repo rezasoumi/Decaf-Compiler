@@ -2,7 +2,7 @@ import re
 
 from lark import Lark
 
-from lexer import replace_defines
+from .lexer import replace_defines
 
 json_parser = Lark(r"""
     program: macro* decl+
