@@ -23,22 +23,24 @@ json_parser = Lark(r"""
     breakstmt: "break;"
     continuestmt: "continue;"
     printstmt: "print" ("," expr)+
-    expr: lvalue "=" expr | constant | lvalue | "this" | call | "(" expr ")" | expr "-" expr | expr "+" expr
+    expr: lvalue "=" expr | lvalue "+=" expr | lvalue "-=" expr | constant | lvalue | "this" | call | "(" expr ")" | expr "-" expr | expr "+" expr
         | expr "*" expr | expr "/" expr | expr "%" expr | "-" expr | expr "<" expr | expr "<=" expr
         | expr ">" expr | expr ">=" expr | expr "==" expr | expr "!=" expr | expr "&&" expr | expr "||" expr
         | "!" expr | "ReadInteger()" | "readLine()" | "new" ident | "NewArray(" expr "," type ")" | "itod(" expr ")"
-        | "dtoi(" expr ")" | "itob(" expr ")" | "btoi(" expr ")"
+        | "dtoi(" expr ")" | "itob(" expr ")" | "btoi(" expr ")"  
     lvalue: ident | expr "." ident | "expr[" expr "]" 
     call: ident "(" actuals ")" | expr "." ident "(" actuals ")" 
     actuals: ("," expr)+  | null
-    constant: INT | doubleconstant | boolconstant | ESCAPED_STRING | "null"
+    constant: doubleconstant | INT | boolconstant | ESCAPED_STRING | base16 | "null"
     
     null:
     ident: /[a-zA-Z][a-zA-Z0-9_]*/ | /__func__[a-zA-Z0-9_]*/ | /__line__[a-zA-Z0-9_]*/ 
-    doubleconstant: /[0-9]+\\.[0-9]*/ | /[0-9]+\\.[0-9]*[Ee][+-]?[0-9]+/
+    doubleconstant: /[0-9]+/"."/[0-9]+/ | /[0-9]+/"." | /[0-9]+/"."/[0-9]*[Ee][+-]?[0-9]+/
     boolconstant: "True" | "False"
+    INT: /[0-9]+/
+    base16: /0[xX][0-9a-fA-F]+/
+    
     %import common.ESCAPED_STRING
-    %import common.INT 
     %import common.WS
     %ignore WS
 """, start='program', parser='lalr')
