@@ -26,10 +26,10 @@ for step, name in enumerate(all_tests.keys()):
         answer = open(f"../tests/in-out/{name}.out").read()
         res = run(f"../tests/in-out/{name}.in")
         if res and answer == "OK":
-            print("OK", step)
+            # print("OK", step)
             correct += 1
         elif not res and answer != "OK":
-            print("OK", step)
+            # print("OK", step)
             correct += 1
         else:
             print("WRONG ", step)
