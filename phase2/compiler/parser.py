@@ -2,7 +2,7 @@ import re
 
 from lark import Lark
 
-from phase1.student.compiler.lexer import replace_defines
+from lexer import replace_defines
 
 json_parser = Lark(r"""
     program: macro* decl+
@@ -70,7 +70,7 @@ def reprep(string):
 
 
 def replace_ident(string):
-    stopWords=['.',' ','\n',']','[','(',')',';','!','-']
+    stopWords=['.',' ','\n',']','[','(',')',';','!','-','\t']
     ans = ""
     current = ""
     for i in range(len(string)):
@@ -86,7 +86,7 @@ def replace_ident(string):
 
 
 def parser(string):
-    # string = replace_defines(string + ' ')
+    string = replace_defines(string + ' ')
     string = remove_comment(string)
     string = string.replace(");", ") ;")
     string = replace_ident(string)
@@ -95,4 +95,4 @@ def parser(string):
     return json_parser.parse(string)
 
 
-print(parser(open(f"../tests/in-out/myfile.in").read()).pretty())
+# print(parser(open(f"../tests/in-out/t205-define.in").read()).pretty())

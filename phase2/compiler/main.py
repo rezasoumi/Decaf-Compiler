@@ -23,7 +23,7 @@ wrongs = []
 for step, name in enumerate(all_tests.keys()):
     total += 1
     try:
-        answer = open(f"../tests/in-out/{name}.out").read()
+        answer = open(f"../tests/in-out/{name}.out").read().rstrip().lstrip()
         res = run(f"../tests/in-out/{name}.in")
         if res and answer == "OK":
             # print("OK", step)
@@ -33,6 +33,7 @@ for step, name in enumerate(all_tests.keys()):
             correct += 1
         else:
             wrongs.append(step)
+            print(res,answer, answer.rstrip().lstrip()=="OK",name)
             print("WRONG ", step)
     except:
         error += 1
