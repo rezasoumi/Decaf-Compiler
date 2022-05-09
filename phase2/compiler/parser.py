@@ -61,7 +61,7 @@ def remove_comment(s):
 
 
 def reprep(string):
-    keywords = "true, false, return, void, int, double, bool, string, class, interface, null, this, extends, implements, for, while, if, else, return, break, continue, new, NewArray, Print, ReadInteger, ReadLine, dtoi, itod, btoi, itob, private, protected, public, import".split(
+    keywords = "define, true, false, return, void, int, double, bool, string, class, interface, null, this, extends, implements, for, while, if, else, return, break, continue, new, NewArray, Print, ReadInteger, ReadLine, dtoi, itod, btoi, itob, private, protected, public, import".split(
         ", ")
     if string not in keywords and (re.match("[a-zA-Z][a-zA-Z0-9_]*",string) or re.match("__func__[a-zA-Z0-9_]*",string) or re.match("__line__[a-zA-Z0-9_]*",string)):
         return "@"+string

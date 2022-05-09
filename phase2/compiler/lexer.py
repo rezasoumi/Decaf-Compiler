@@ -2,6 +2,7 @@ from lark import Lark
 from lark import Transformer
 import re
 
+
 def replace_line(define_map, line):
     """replace line with defined map of previous line"""
     line = re.split('( |"|\[|]|\(|\)|;|\n|\t)', line)
@@ -13,21 +14,26 @@ def replace_line(define_map, line):
         answer += i
     return answer
 
+
 def replace_defines(input):
     """replace lines with defined map with iteration"""
     input_lines = input.split("\n")
-    define_map = {} 
+    define_map = {}
     answer = ""
+    pref = True
     for line in input_lines:
         line = replace_line(define_map, line)
         split_form = line.split()
-        # true define format => define x y => y can have \t
-        if len(split_form) >= 3 and split_form[0] == 'define':
+        if len(split_form) >= 1 and split_form[0] != "define" and split_form[0] != "import":
+            pref = False
+        if len(split_form) >= 3 and split_form[0] == 'define' and pref:
             # add key value of define to map
             define_map[split_form[1]] = " ".join(split_form[2:])
         else:
             answer += line + "\n"
+
     return answer
+
 
 rules = """
     start : (ID | OPERATOR_PUNC | INT_LIT | DOUBLE_LIT | COMMENT | STRING_LIT )*
